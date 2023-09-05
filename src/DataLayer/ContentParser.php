@@ -7,11 +7,9 @@ use Exception;
 // class that you can pass raw string to and it will resolve the csv lines
 class ContentParser
 {
-
-    function __construct(private string $content, private int $headerPosition = 0, private ?string $rowSeperator = null, private ?string $columnSeperator = null)
+    public function __construct(private string $content, private int $headerPosition = 0, private ?string $rowSeperator = null, private ?string $columnSeperator = null)
     {
     }
-
 
     public function decideLineBreak(): string
     {
@@ -21,18 +19,18 @@ class ContentParser
 
         preg_match("/\r\n|\n|\r/", $this->content, $matches);
 
-        if (!empty($matches)) {
+        if (! empty($matches)) {
             $this->rowSeperator = $matches[0];
+
             return $matches[0];
         }
 
-        throw new Exception("no line break found in given content");
+        throw new Exception('no line break found in given content');
     }
 
-
-    function lazySplitIterator(?string $lineSeperator = null)
+    public function lazySplitIterator(string $lineSeperator = null)
     {
-        if (!$lineSeperator) {
+        if (! $lineSeperator) {
             $lineSeperator = $this->decideLineBreak();
         }
 
@@ -44,6 +42,7 @@ class ContentParser
             if ($splitIndex === false) {
                 // If the split character is not found, yield the remaining part of the string
                 yield substr($this->content, $startIndex);
+
                 return; // End the iterator
             } else {
                 // Yield the substring from the current start index to the split index
@@ -70,6 +69,7 @@ class ContentParser
         foreach ($separators as $separator => $pattern) {
             if (preg_match($pattern, $row)) {
                 $this->columnSeperator = $separator;
+
                 return $separator;
             }
         }
@@ -98,10 +98,11 @@ class ContentParser
     public function each(callable $callback): void
     {
         $header = [];
-        
+
         foreach ($this->lazySplitIterator($this->decideLineBreak()) as $key => $value) {
             if ($this->headerPosition === $key) {
                 $header = $this->seperateRow($value);
+
                 continue;
             }
 

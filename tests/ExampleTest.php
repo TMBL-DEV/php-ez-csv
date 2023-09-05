@@ -6,7 +6,7 @@ it('read rows from string using the header as key values and the row values as v
     $content = new ContentParser($csvContent, 0);
     $rows = [];
 
-    $content->each(function (string $key, array $value) use(&$rows){
+    $content->each(function (string $key, array $value) use (&$rows) {
         $rows[] = $value;
     });
 
